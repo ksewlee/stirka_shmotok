@@ -1,255 +1,607 @@
-
 <!DOCTYPE html>
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Постирочная</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap&subset=cyrillic" rel="stylesheet">
+
+<script>
+// Тема выставляется до отрисовки, чтобы не было вспышки
+(function () {
+    try {
+        var saved = localStorage.getItem("wardrobeTheme");
+        var theme = saved || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+        document.documentElement.setAttribute("data-theme", theme);
+    } catch (e) {
+        document.documentElement.setAttribute("data-theme", "light");
+    }
+})();
+</script>
 
 <style>
-* {
-    box-sizing: border-box;
+:root {
+    --bg: #f7f7f5;
+    --surface: #ffffff;
+    --surface-2: #fbfbfa;
+    --text: #17181a;
+    --muted: #70747a;
+    --border: #e7e7e3;
+    --border-strong: #d4d4cf;
+    --accent: #17181a;
+    --accent-hover: #34363a;
+    --accent-text: #ffffff;
+    --soft: #efefec;
+    --soft-hover: #e6e6e2;
+    --link: #2f5d50;
+    --ok: #4f7a63;
+    --warn: #a8803a;
+    --bad: #b25a4a;
+    --glass: rgba(255, 255, 255, .82);
+    --shadow: 0 1px 2px rgba(23, 24, 26, .04);
+    --shadow-lg: 0 12px 32px -8px rgba(23, 24, 26, .14);
+    --ease: cubic-bezier(.22, .8, .3, 1);
+    --radius: 14px;
 }
+
+[data-theme="dark"] {
+    --bg: #0e0f11;
+    --surface: #16171a;
+    --surface-2: #121315;
+    --text: #ecece9;
+    --muted: #8b8f96;
+    --border: #25272b;
+    --border-strong: #35383d;
+    --accent: #ecece9;
+    --accent-hover: #ffffff;
+    --accent-text: #0e0f11;
+    --soft: #1e2023;
+    --soft-hover: #272a2e;
+    --link: #8fbfae;
+    --ok: #6fa488;
+    --warn: #cfa35a;
+    --bad: #d08070;
+    --glass: rgba(18, 19, 21, .78);
+    --shadow: 0 1px 2px rgba(0, 0, 0, .3);
+    --shadow-lg: 0 14px 34px -8px rgba(0, 0, 0, .6);
+}
+
+* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; color-scheme: light; }
+html[data-theme="dark"] { color-scheme: dark; }
 
 body {
     margin: 0;
-    background: #f5f3ee;
-    color: #202c40;
-    font-family: Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+    font-size: 15px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    font-variant-numeric: tabular-nums;
+    transition: background .4s ease, color .4s ease;
 }
 
+.theme-anim *,
+.theme-anim *::before,
+.theme-anim *::after {
+    transition: background-color .4s ease, color .4s ease,
+                border-color .4s ease, box-shadow .4s ease !important;
+}
+
+/* ---------- Шапка ---------- */
 header {
-    padding: 35px 8%;
+    padding: 18px max(24px, calc((100% - 1120px) / 2));
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 1px solid #deddd7;
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background: color-mix(in srgb, var(--bg) 80%, transparent);
+    backdrop-filter: saturate(160%) blur(14px);
+    -webkit-backdrop-filter: saturate(160%) blur(14px);
+    border-bottom: 1px solid var(--border);
 }
 
-.logo {
-    font-family: Georgia, serif;
-    font-size: 27px;
-    letter-spacing: 1px;
+.brand { display: flex; align-items: center; gap: 12px; }
+
+.mark {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    background: var(--accent);
+    color: var(--accent-text);
+    display: grid;
+    place-items: center;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: -.02em;
 }
 
-.subtitle {
-    color: #898a8c;
-    font-size: 12px;
-    letter-spacing: 2px;
-    margin-top: 5px;
+.logo { font-size: 15px; font-weight: 600; letter-spacing: -.01em; line-height: 1.1; }
+.subtitle { color: var(--muted); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; margin-top: 3px; }
+
+.theme-toggle {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    padding: 0;
+    background: transparent;
+    color: var(--text);
+    border: 1px solid var(--border);
+    display: grid;
+    place-items: center;
 }
+.theme-toggle:hover { background: var(--soft); }
+.theme-toggle span { display: grid; place-items: center; transition: transform .5s var(--ease), opacity .3s ease; }
+.theme-toggle.spin span { transform: rotate(180deg) scale(.6); opacity: 0; }
+.theme-toggle svg { width: 18px; height: 18px; }
+.theme-toggle .i-sun { display: none; }
+[data-theme="dark"] .theme-toggle .i-sun { display: block; }
+[data-theme="dark"] .theme-toggle .i-moon { display: none; }
 
 main {
-    max-width: 1100px;
-    margin: 55px auto;
-    padding: 0 20px;
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 56px 24px 24px;
 }
 
-.intro {
-    margin-bottom: 35px;
+/* ---------- Заголовки ---------- */
+.eyebrow {
+    font-size: 12px;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 14px;
 }
 
 h1 {
-    font-family: Georgia, serif;
-    font-size: 38px;
-    font-weight: normal;
-    margin-bottom: 10px;
+    font-size: clamp(32px, 5vw, 46px);
+    font-weight: 600;
+    letter-spacing: -.035em;
+    line-height: 1.08;
+    margin: 0 0 14px;
 }
 
-.intro p {
-    color: #858585;
+.intro { margin-bottom: 40px; }
+.intro p { color: var(--muted); margin: 0; max-width: 460px; font-size: 16px; }
+
+h2 {
+    font-size: 17px;
+    font-weight: 600;
+    letter-spacing: -.015em;
+    margin: 0;
 }
 
+.reveal {
+    opacity: 0;
+    transform: translateY(14px);
+    animation: reveal .7s var(--ease) forwards;
+}
+.reveal:nth-child(2) { animation-delay: .07s; }
+.reveal:nth-child(3) { animation-delay: .14s; }
+.reveal:nth-child(4) { animation-delay: .21s; }
+@keyframes reveal { to { opacity: 1; transform: none; } }
+
+/* ---------- Статистика ---------- */
 .stats {
-    display: flex;
-    gap: 15px;
-    margin-bottom: 35px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    margin-bottom: 20px;
+    overflow: hidden;
 }
 
 .stat {
-    background: white;
-    padding: 20px;
-    border-radius: 12px;
-    flex: 1;
+    padding: 22px 26px;
+    border-right: 1px solid var(--border);
 }
+.stat:last-child { border-right: none; }
 
 .stat strong {
     display: block;
-    font-family: Georgia, serif;
-    font-size: 30px;
-    margin-bottom: 5px;
+    font-size: 34px;
+    font-weight: 500;
+    letter-spacing: -.03em;
+    line-height: 1.1;
+    margin-bottom: 6px;
 }
+.stat span { color: var(--muted); font-size: 13px; }
 
-.stat span {
-    color: #888;
-    font-size: 13px;
-}
-
+/* ---------- Добавление ---------- */
 .add-section {
-    background: white;
-    padding: 25px;
-    border-radius: 15px;
-    margin-bottom: 45px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    margin-bottom: 56px;
+    overflow: hidden;
 }
 
-h2 {
-    font-family: Georgia, serif;
-    font-weight: normal;
-    font-size: 23px;
-}
-
-.form {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 15px;
-}
-
-.field {
+.add-head {
+    width: 100%;
+    background: none;
+    color: var(--text);
+    border-radius: 0;
+    padding: 18px 26px;
     display: flex;
-    flex-direction: column;
-    gap: 8px;
+    justify-content: space-between;
+    align-items: center;
+    text-align: left;
 }
+.add-head:hover { background: var(--surface-2); }
 
-.field label {
-    font-size: 13px;
-    color: #777;
+.chev {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    border: 1px solid var(--border-strong);
+    display: grid;
+    place-items: center;
+    font-size: 16px;
+    line-height: 1;
+    color: var(--muted);
+    transition: transform .4s var(--ease);
 }
+.add-section.open .chev { transform: rotate(45deg); }
 
-input {
-    padding: 12px;
-    border: 1px solid #deddd7;
-    border-radius: 7px;
-    background: #faf9f6;
+.add-body {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows .5s var(--ease);
+}
+.add-section.open .add-body { grid-template-rows: 1fr; }
+.add-body > div { overflow: hidden; }
+.add-inner { padding: 6px 26px 26px; border-top: 1px solid transparent; }
+.add-section.open .add-inner { padding-top: 22px; border-top-color: var(--border); }
+
+.form { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.field { display: flex; flex-direction: column; gap: 7px; }
+.field label { font-size: 12px; color: var(--muted); font-weight: 500; }
+.file-field { grid-column: 1 / -1; }
+.file-field:has(.preview:not(.show)) { display: none; }
+
+input, select {
+    padding: 11px 13px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--surface-2);
+    color: var(--text);
     font-size: 14px;
     width: 100%;
+    font-family: inherit;
+    transition: border-color .25s ease, box-shadow .25s ease, background .4s ease;
+}
+input::placeholder { color: var(--muted); opacity: .7; }
+input:hover, select:hover { border-color: var(--border-strong); }
+input:focus, select:focus {
+    outline: none;
+    border-color: var(--text);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--text) 10%, transparent);
+}
+input[type="file"] { padding: 8px 10px; color: var(--muted); font-size: 13px; }
+input[type="file"]::file-selector-button {
+    margin-right: 12px;
+    border: 1px solid var(--border-strong);
+    background: var(--surface);
+    color: var(--text);
+    border-radius: 7px;
+    padding: 5px 11px;
+    font-family: inherit;
+    font-size: 12px;
+    cursor: pointer;
 }
 
-.file-field {
-    grid-column: 1 / -1;
+.preview {
+    display: none;
+    width: 88px;
+    height: 88px;
+    object-fit: cover;
+    border-radius: 12px;
+    border: 1px solid var(--border);
 }
+.preview.show { display: block; animation: pop .35s var(--ease); }
+@keyframes pop { from { opacity: 0; transform: scale(.9); } to { opacity: 1; transform: none; } }
 
 button {
     border: none;
     cursor: pointer;
-    border-radius: 7px;
-    padding: 13px 20px;
-    background: #202c40;
-    color: white;
+    border-radius: 10px;
+    padding: 11px 18px;
+    background: var(--accent);
+    color: var(--accent-text);
     font-size: 14px;
-    transition: 0.2s;
+    font-weight: 500;
+    font-family: inherit;
+    letter-spacing: -.005em;
+    transition: background .25s ease, transform .15s ease, border-color .25s ease, opacity .25s ease;
+}
+button:hover { background: var(--accent-hover); }
+button:active { transform: scale(.97); }
+button:focus-visible { outline: 2px solid var(--text); outline-offset: 2px; }
+
+.add-button { margin-top: 22px; }
+
+.btn-soft {
+    background: transparent;
+    color: var(--text);
+    border: 1px solid var(--border-strong);
+}
+.btn-soft:hover { background: var(--soft); }
+
+/* ---------- Список ---------- */
+.list-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 18px;
+}
+.list-head h2 { font-size: 22px; letter-spacing: -.025em; }
+
+.toolbar {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+    margin-bottom: 14px;
+}
+.toolbar .search { flex: 1; min-width: 200px; }
+.toolbar select { width: auto; min-width: 210px; cursor: pointer; }
+
+.chips {
+    display: inline-flex;
+    gap: 2px;
+    padding: 3px;
+    background: var(--soft);
+    border-radius: 11px;
+    margin-bottom: 28px;
+    flex-wrap: wrap;
 }
 
-button:hover {
-    background: #394d69;
+.chip {
+    padding: 7px 14px;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 500;
 }
-
-.add-button {
-    margin-top: 20px;
-}
+.chip:hover { background: transparent; color: var(--text); }
+.chip.active { background: var(--surface); color: var(--text); box-shadow: var(--shadow), 0 0 0 1px var(--border); }
 
 .grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 22px;
+    gap: 20px;
 }
 
 .item {
-    background: white;
-    border-radius: 13px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
     overflow: hidden;
+    transition: transform .4s var(--ease), box-shadow .4s ease, border-color .3s ease, opacity .3s ease;
+}
+.item:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); border-color: var(--border-strong); }
+
+.item.enter { animation: cardIn .6s var(--ease) both; }
+@keyframes cardIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: none; }
 }
 
-.item img {
+.item.removing { opacity: 0; transform: scale(.94); pointer-events: none; }
+
+.thumb { position: relative; overflow: hidden; aspect-ratio: 4 / 4.4; background: var(--soft); }
+
+.thumb img {
     width: 100%;
-    height: 240px;
+    height: 100%;
     object-fit: cover;
-    background: #e8e6df;
+    display: block;
+    transition: transform .8s var(--ease);
+}
+.item:hover .thumb img { transform: scale(1.04); }
+
+.placeholder {
+    width: 100%;
+    height: 100%;
+    display: grid;
+    place-items: center;
+    font-size: 72px;
+    font-weight: 300;
+    letter-spacing: -.04em;
+    color: var(--border-strong);
 }
 
-.item-info {
-    padding: 18px;
+.badge {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 5px 11px 5px 9px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text);
+    background: var(--glass);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--border);
 }
+.badge::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+.badge.ok::before { background: var(--ok); }
+.badge.warn::before { background: var(--warn); }
+.badge.bad::before { background: var(--bad); }
+
+.item-info { padding: 18px 18px 18px; }
 
 .item-info h3 {
-    font-family: Georgia, serif;
-    font-size: 21px;
-    font-weight: normal;
-    margin: 0 0 13px;
+    font-size: 17px;
+    font-weight: 600;
+    letter-spacing: -.02em;
+    margin: 0 0 6px;
+    word-break: break-word;
 }
 
-.date {
-    font-size: 13px;
-    color: #888;
-    margin-bottom: 8px;
-}
+.date { font-size: 13px; color: var(--muted); margin-bottom: 2px; }
+.elapsed { font-size: 13px; color: var(--muted); margin-bottom: 14px; }
 
-.elapsed {
-    font-size: 13px;
-    color: #394d69;
+.bar {
+    height: 3px;
+    border-radius: 3px;
+    background: var(--soft);
+    overflow: hidden;
     margin-bottom: 18px;
 }
+.bar i { display: block; height: 100%; width: 0; border-radius: 3px; transition: width 1s var(--ease); }
+.bar i.ok { background: var(--ok); }
+.bar i.warn { background: var(--warn); }
+.bar i.bad { background: var(--bad); }
 
-.card-buttons {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-}
-
-.card-buttons button {
-    flex: 1;
-    padding: 10px 5px;
-    font-size: 12px;
-    min-width: 75px;
-}
-
-.delete {
-    background: #eeeae5;
-    color: #555;
-}
-
-.delete:hover {
-    background: #ded8d0;
-}
+.card-buttons { display: flex; gap: 8px; }
+.card-buttons button { flex: 1; padding: 9px 8px; font-size: 13px; }
+.card-buttons .wash { flex-basis: 100%; }
+.card-buttons { flex-wrap: wrap; }
 
 .empty {
-    color: #999;
+    color: var(--muted);
     text-align: center;
-    padding: 50px;
+    padding: 70px 20px;
     grid-column: 1 / -1;
+    border: 1px dashed var(--border-strong);
+    border-radius: var(--radius);
+    animation: reveal .6s var(--ease) forwards;
+    opacity: 0;
 }
+
+.tools {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 56px;
+}
+.tools button { font-size: 13px; padding: 9px 15px; color: var(--muted); }
+.tools button:hover { color: var(--text); }
 
 footer {
     text-align: center;
-    padding: 40px;
-    color: #aaa;
-    font-size: 12px;
+    padding: 36px 24px 44px;
+    color: var(--muted);
+    font-size: 11px;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    opacity: .7;
 }
 
-@media(max-width: 750px) {
-    .grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
+/* ---------- Модальное окно ---------- */
+.overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(10, 11, 13, .45);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    display: grid;
+    place-items: center;
+    padding: 20px;
+    z-index: 50;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity .3s ease, visibility .3s;
+}
+.overlay.open { opacity: 1; visibility: visible; }
+
+.modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 26px;
+    width: 100%;
+    max-width: 400px;
+    box-shadow: var(--shadow-lg);
+    transform: translateY(16px) scale(.97);
+    transition: transform .4s var(--ease);
+}
+.overlay.open .modal { transform: none; }
+.modal h2 { font-size: 19px; margin-bottom: 20px; }
+.modal .field { margin-bottom: 14px; }
+.modal-actions { display: flex; gap: 10px; margin-top: 22px; }
+.modal-actions button { flex: 1; }
+
+/* ---------- Уведомления ---------- */
+.toasts {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: center;
+    z-index: 60;
+    width: calc(100% - 32px);
+    max-width: 400px;
+    pointer-events: none;
+}
+.toast {
+    pointer-events: auto;
+    background: var(--accent);
+    color: var(--accent-text);
+    padding: 11px 14px 11px 16px;
+    border-radius: 12px;
+    font-size: 13px;
+    display: flex;
+    gap: 14px;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    box-shadow: var(--shadow-lg);
+    animation: toastIn .4s var(--ease);
+    transition: opacity .3s ease, transform .3s ease;
+}
+.toast.out { opacity: 0; transform: translateY(10px); }
+.toast button {
+    background: transparent;
+    color: inherit;
+    padding: 4px 8px;
+    font-size: 13px;
+    font-weight: 600;
+    opacity: .8;
+}
+.toast button:hover { background: transparent; opacity: 1; }
+@keyframes toastIn { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+
+@media(max-width: 860px) {
+    .grid { grid-template-columns: repeat(2, 1fr); }
 }
 
-@media(max-width: 500px) {
-    .grid {
-        grid-template-columns: 1fr;
-    }
+@media(max-width: 560px) {
+    header { padding: 14px 18px; }
+    main { padding: 36px 18px 16px; }
+    .grid { grid-template-columns: 1fr; }
+    .form { grid-template-columns: 1fr; }
+    .file-field { grid-column: auto; }
+    .stat { padding: 16px 14px; }
+    .stat strong { font-size: 26px; }
+    .stat span { font-size: 12px; }
+    .toolbar select { width: 100%; }
+    .chips { display: flex; }
+    .chip { flex: 1; padding: 7px 6px; font-size: 12px; }
+}
 
-    .form {
-        grid-template-columns: 1fr;
-    }
-
-    .file-field {
-        grid-column: auto;
-    }
-
-    .stats {
-        flex-direction: column;
-    }
-
-    h1 {
-        font-size: 30px;
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: .01ms !important;
+        transition-duration: .01ms !important;
+        scroll-behavior: auto !important;
     }
 }
 </style>
@@ -258,106 +610,212 @@ footer {
 <body>
 
 <header>
-    <div>
-        <div class="logo">ПОСТИРОЧНАЯ.</div>
-        <div class="subtitle">УХОД ЗА ВЕЩАМИ</div>
+    <div class="brand">
+        <div class="mark">П</div>
+        <div>
+            <div class="logo">Постирочная</div>
+            <div class="subtitle">Уход за вещами</div>
+        </div>
     </div>
-    <div>✦</div>
+    <button class="theme-toggle" id="themeToggle" type="button" aria-label="Переключить тему">
+        <span id="themeIcon">
+            <svg class="i-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg>
+            <svg class="i-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+        </span>
+    </button>
 </header>
 
 <main>
 
-    <section class="intro">
-        <h1>Мой гардероб</h1>
-        <p>Все твои вещи в одном месте. Следи за чистотой и уходом.</p>
+    <section class="intro reveal">
+        <div class="eyebrow">Гардероб</div>
+        <h1>Всё под контролем</h1>
+        <p>Все вещи в одном месте. Следи за чистотой и вовремя напоминай себе о стирке.</p>
     </section>
 
-    <section class="stats">
+    <section class="stats reveal">
         <div class="stat">
             <strong id="total">0</strong>
             <span>Всего вещей</span>
         </div>
-
+        <div class="stat">
+            <strong id="needWash">0</strong>
+            <span>Пора стирать</span>
+        </div>
         <div class="stat">
             <strong id="washed">0</strong>
             <span>Постирано сегодня</span>
         </div>
     </section>
 
-    <section class="add-section">
-        <h2>Добавить вещь</h2>
+    <section class="add-section reveal" id="addSection">
+        <button class="add-head" type="button" id="addToggle" aria-expanded="false">
+            <h2>Добавить вещь</h2>
+            <span class="chev">+</span>
+        </button>
 
-        <form id="form">
-            <div class="form">
+        <div class="add-body">
+            <div>
+                <div class="add-inner">
+                    <form id="form">
+                        <div class="form">
+                            <div class="field">
+                                <label for="name">Название вещи</label>
+                                <input id="name" type="text" maxlength="60"
+                                    placeholder="Например, белая рубашка" required>
+                            </div>
 
-                <div class="field">
-                    <label>Название вещи</label>
-                    <input id="name" type="text"
-                        placeholder="Например, белая рубашка" required>
+                            <div class="field">
+                                <label for="date">Дата последней стирки</label>
+                                <input id="date" type="date" required>
+                            </div>
+
+                            <div class="field">
+                                <label for="interval">Стирать каждые (дней)</label>
+                                <input id="interval" type="number" min="1" max="365" value="7" required>
+                            </div>
+
+                            <div class="field">
+                                <label for="photo">Фотография (необязательно)</label>
+                                <input id="photo" type="file" accept="image/*">
+                            </div>
+
+                            <div class="field file-field">
+                                <img id="preview" class="preview" alt="Предпросмотр">
+                            </div>
+                        </div>
+
+                        <button class="add-button" type="submit">Добавить в гардероб</button>
+                    </form>
                 </div>
-
-                <div class="field">
-                    <label>Дата последней стирки</label>
-                    <input id="date" type="date" required>
-                </div>
-
-                <div class="field file-field">
-                    <label>Фотография вещи</label>
-                    <input id="photo" type="file"
-                        accept="image/*" required>
-                </div>
-
             </div>
-
-            <button class="add-button" type="submit">
-                + Добавить в гардероб
-            </button>
-        </form>
+        </div>
     </section>
 
-    <section>
-        <h2>Мои вещи</h2>
+    <section class="reveal">
+        <div class="list-head"><h2>Мои вещи</h2></div>
+
+        <div class="toolbar">
+            <input class="search" id="search" type="search" placeholder="Поиск по названию…">
+            <select id="sort" aria-label="Сортировка">
+                <option value="old">Сначала давно не стиранные</option>
+                <option value="new">Сначала недавно стиранные</option>
+                <option value="name">По названию</option>
+                <option value="added">Сначала новые в списке</option>
+            </select>
+        </div>
+
+        <div class="chips" id="chips">
+            <button type="button" class="chip active" data-filter="all">Все</button>
+            <button type="button" class="chip" data-filter="bad">Пора стирать</button>
+            <button type="button" class="chip" data-filter="warn">Скоро</button>
+            <button type="button" class="chip" data-filter="ok">Свежее</button>
+        </div>
+
         <div class="grid" id="grid"></div>
+
+        <div class="tools">
+            <button type="button" class="btn-soft" id="exportBtn">Сохранить копию</button>
+            <button type="button" class="btn-soft" id="importBtn">Загрузить копию</button>
+            <input type="file" id="importFile" accept="application/json" hidden>
+        </div>
     </section>
 
 </main>
 
 <footer>
-    ПОСТИРОЧНАЯ · УХОД ЗА ВЕЩАМИ
+    Постирочная · Уход за вещами
 </footer>
 
+<!-- Редактирование -->
+<div class="overlay" id="overlay">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+        <h2 id="modalTitle">Изменить вещь</h2>
+
+        <div class="field">
+            <label for="editName">Название</label>
+            <input id="editName" type="text" maxlength="60">
+        </div>
+        <div class="field">
+            <label for="editDate">Дата последней стирки</label>
+            <input id="editDate" type="date">
+        </div>
+        <div class="field">
+            <label for="editInterval">Стирать каждые (дней)</label>
+            <input id="editInterval" type="number" min="1" max="365">
+        </div>
+
+        <div class="modal-actions">
+            <button type="button" class="btn-soft" id="editCancel">Отмена</button>
+            <button type="button" id="editSave">Сохранить</button>
+        </div>
+    </div>
+</div>
+
+<div class="toasts" id="toasts"></div>
+
 <script>
+const STORAGE_KEY = "wardrobeItems";
+const THEME_KEY = "wardrobeTheme";
 
-const form = document.getElementById("form");
-const grid = document.getElementById("grid");
-const nameInput = document.getElementById("name");
-const dateInput = document.getElementById("date");
-const photoInput = document.getElementById("photo");
+const $ = (id) => document.getElementById(id);
 
-let clothes = JSON.parse(
-    localStorage.getItem("wardrobeItems") || "[]"
-);
+const form = $("form");
+const grid = $("grid");
+const nameInput = $("name");
+const dateInput = $("date");
+const intervalInput = $("interval");
+const photoInput = $("photo");
+const preview = $("preview");
 
-function today() {
-    const d = new Date();
-    const y = d.getFullYear();
-    const m = String(d.getMonth() + 1).padStart(2, "0");
-    const day = String(d.getDate()).padStart(2, "0");
+let clothes = load();
+let filter = "all";
+let query = "";
+let sortMode = "old";
+let editingId = null;
+let enterIds = new Set(clothes.map(c => c.id)); // анимируем появление при загрузке
+let photoData = "";
 
-    return `${y}-${m}-${day}`;
+/* ---------- Данные ---------- */
+
+function uid() {
+    return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
 }
 
-dateInput.value = today();
+function load() {
+    let list = [];
+    try {
+        list = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+        if (!Array.isArray(list)) list = [];
+    } catch (e) {
+        list = [];
+    }
+    // Миграция старых записей
+    return list.map((c, i) => ({
+        id: c.id || uid() + i,
+        name: String(c.name || "Без названия"),
+        date: c.date || today(),
+        photo: c.photo || "",
+        interval: Number(c.interval) > 0 ? Number(c.interval) : 7,
+        added: c.added || Date.now() + i
+    }));
+}
 
 function save() {
     try {
-        localStorage.setItem(
-            "wardrobeItems",
-            JSON.stringify(clothes)
-        );
-    } catch (error) {
-        alert("Не удалось сохранить данные. Возможно, память браузера заполнена.");
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(clothes));
+        return true;
+    } catch (e) {
+        toast("Не удалось сохранить: память браузера заполнена.");
+        return false;
     }
+}
+
+/* ---------- Даты ---------- */
+
+function today() {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 }
 
 function formatDate(value) {
@@ -367,216 +825,348 @@ function formatDate(value) {
 
 function daysPassed(value) {
     const [y, m, d] = value.split("-").map(Number);
-
     const date = new Date(y, m - 1, d);
     const now = new Date();
-
-    const todayDate = new Date(
-        now.getFullYear(),
-        now.getMonth(),
-        now.getDate()
-    );
-
-    return Math.round(
-        (todayDate - date) / 86400000
-    );
+    const t = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    return Math.round((t - date) / 86400000);
 }
 
-function createElement(tag, className, text) {
-    const element = document.createElement(tag);
+function plural(n, one, few, many) {
+    const a = Math.abs(n) % 100, b = a % 10;
+    if (a > 10 && a < 20) return many;
+    if (b > 1 && b < 5) return few;
+    if (b === 1) return one;
+    return many;
+}
 
-    if (className) element.className = className;
-    if (text !== undefined) element.textContent = text;
+function statusOf(item) {
+    const days = daysPassed(item.date);
+    if (days >= item.interval) return "bad";
+    if (days >= item.interval * 0.7) return "warn";
+    return "ok";
+}
 
-    return element;
+const STATUS_TEXT = { ok: "Свежее", warn: "Скоро стирать", bad: "Пора стирать" };
+
+/* ---------- Утилиты ---------- */
+
+function el(tag, className, text) {
+    const e = document.createElement(tag);
+    if (className) e.className = className;
+    if (text !== undefined) e.textContent = text;
+    return e;
+}
+
+function animateNumber(node, to) {
+    const from = Number(node.textContent) || 0;
+    if (from === to) return;
+    const start = performance.now();
+    const dur = 600;
+    function step(now) {
+        const p = Math.min(1, (now - start) / dur);
+        const eased = 1 - Math.pow(1 - p, 3);
+        node.textContent = Math.round(from + (to - from) * eased);
+        if (p < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+}
+
+function toast(message, actionText, action) {
+    const box = el("div", "toast");
+    box.append(el("span", "", message));
+
+    let timer;
+    const close = () => {
+        clearTimeout(timer);
+        box.classList.add("out");
+        setTimeout(() => box.remove(), 300);
+    };
+
+    if (actionText) {
+        const b = el("button", "", actionText);
+        b.type = "button";
+        b.onclick = () => { action(); close(); };
+        box.append(b);
+    }
+
+    $("toasts").append(box);
+    timer = setTimeout(close, actionText ? 6000 : 3500);
+}
+
+/* ---------- Отрисовка ---------- */
+
+function visibleItems() {
+    let list = clothes.filter(c => {
+        if (filter !== "all" && statusOf(c) !== filter) return false;
+        if (query && !c.name.toLowerCase().includes(query)) return false;
+        return true;
+    });
+
+    if (sortMode === "old") list.sort((a, b) => a.date.localeCompare(b.date));
+    if (sortMode === "new") list.sort((a, b) => b.date.localeCompare(a.date));
+    if (sortMode === "name") list.sort((a, b) => a.name.localeCompare(b.name, "ru"));
+    if (sortMode === "added") list.sort((a, b) => b.added - a.added);
+
+    return list;
+}
+
+function updateStats() {
+    animateNumber($("total"), clothes.length);
+    animateNumber($("needWash"), clothes.filter(c => statusOf(c) === "bad").length);
+    animateNumber($("washed"), clothes.filter(c => c.date === today()).length);
 }
 
 function render() {
+    updateStats();
     grid.innerHTML = "";
 
-    document.getElementById("total").textContent =
-        clothes.length;
+    const list = visibleItems();
 
-    document.getElementById("washed").textContent =
-        clothes.filter(item => item.date === today()).length;
-
-    if (clothes.length === 0) {
-        grid.appendChild(
-            createElement(
-                "div",
-                "empty",
-                "Твой гардероб пока пуст. Добавь первую вещь ✦"
-            )
-        );
-
+    if (list.length === 0) {
+        const msg = clothes.length === 0
+            ? "Твой гардероб пока пуст. Добавь первую вещь, чтобы начать."
+            : "Ничего не найдено. Попробуй изменить поиск или фильтр.";
+        grid.append(el("div", "empty", msg));
         return;
     }
 
-    clothes.forEach((item, index) => {
+    list.forEach((item, i) => grid.append(createCard(item, i)));
+    enterIds.clear();
+}
 
-        const card = createElement("article", "item");
+function createCard(item, index) {
+    const card = el("article", "item");
+    card.dataset.id = item.id;
 
+    if (enterIds.has(item.id)) {
+        card.classList.add("enter");
+        card.style.animationDelay = Math.min(index, 12) * 60 + "ms";
+    }
+
+    const status = statusOf(item);
+    const days = daysPassed(item.date);
+
+    // Фото
+    const thumb = el("div", "thumb");
+    if (item.photo) {
         const img = document.createElement("img");
         img.src = item.photo;
         img.alt = item.name;
+        img.loading = "lazy";
+        thumb.append(img);
+    } else {
+        thumb.append(el("div", "placeholder", item.name.charAt(0).toUpperCase()));
+    }
+    thumb.append(el("div", "badge " + status, STATUS_TEXT[status]));
 
-        const info = createElement("div", "item-info");
+    // Информация
+    const info = el("div", "item-info");
+    info.append(el("h3", "", item.name));
+    info.append(el("div", "date", "Последняя стирка: " + formatDate(item.date)));
 
-        const title = createElement("h3", "", item.name);
+    let text;
+    if (days < 0) text = "Дата стирки ещё не наступила";
+    else if (days === 0) text = "Постирано сегодня";
+    else if (days === 1) text = "Прошёл 1 день после стирки";
+    else text = `Прошло ${days} ${plural(days, "день", "дня", "дней")} после стирки`;
 
-        const date = createElement(
-            "div",
-            "date",
-            "Последняя стирка: " + formatDate(item.date)
-        );
+    info.append(el("div", "elapsed", text));
 
-        const days = daysPassed(item.date);
+    // Шкала до следующей стирки
+    const bar = el("div", "bar");
+    const fill = el("i", status);
+    bar.append(fill);
+    info.append(bar);
+    const percent = Math.max(0, Math.min(100, (days / item.interval) * 100));
+    requestAnimationFrame(() => requestAnimationFrame(() => { fill.style.width = percent + "%"; }));
 
-        let elapsedText;
+    // Кнопки
+    const buttons = el("div", "card-buttons");
 
-        if (days < 0) {
-            elapsedText = "Дата стирки ещё не наступила";
-        } else if (days === 0) {
-            elapsedText = "Постирано сегодня ✦";
-        } else if (days === 1) {
-            elapsedText = "Прошёл 1 день после стирки";
-        } else {
-            elapsedText = `Прошло ${days} дней после стирки`;
-        }
-
-        const elapsed = createElement(
-            "div",
-            "elapsed",
-            elapsedText
-        );
-
-        const buttons = createElement("div", "card-buttons");
-
-        const wash = createElement(
-            "button",
-            "",
-            "✓ Постирано сегодня"
-        );
-
-        wash.onclick = () => {
-            clothes[index].date = today();
+    const wash = el("button", "wash", "Постирано сегодня");
+    wash.type = "button";
+    wash.onclick = () => {
+        const prev = item.date;
+        item.date = today();
+        save();
+        render();
+        toast(`«${item.name}» постирано`, "Отменить", () => {
+            item.date = prev;
             save();
             render();
-        };
+        });
+    };
 
-        const edit = createElement(
-            "button",
-            "delete",
-            "Изменить дату"
-        );
+    const edit = el("button", "btn-soft", "Изменить");
+    edit.type = "button";
+    edit.onclick = () => openEdit(item.id);
 
-        edit.onclick = () => {
-            const newDate = prompt(
-                "Введите новую дату стирки (ГГГГ-ММ-ДД):",
-                item.date
-            );
+    const remove = el("button", "btn-soft", "Удалить");
+    remove.type = "button";
+    remove.onclick = () => removeItem(item.id, card);
 
-            if (
-                newDate &&
-                /^\d{4}-\d{2}-\d{2}$/.test(newDate) &&
-                !isNaN(Date.parse(newDate))
-            ) {
-                clothes[index].date = newDate;
-                save();
-                render();
-            } else if (newDate) {
-                alert("Проверь формат даты.");
-            }
-        };
+    buttons.append(wash, edit, remove);
+    info.append(buttons);
 
-        const remove = createElement(
-            "button",
-            "delete",
-            "Удалить"
-        );
-
-        remove.onclick = () => {
-            if (confirm("Удалить эту вещь из гардероба?")) {
-                clothes.splice(index, 1);
-                save();
-                render();
-            }
-        };
-
-        buttons.append(wash, edit, remove);
-
-        info.append(title, date, elapsed, buttons);
-
-        card.append(img, info);
-
-        grid.appendChild(card);
-    });
+    card.append(thumb, info);
+    return card;
 }
 
-form.addEventListener("submit", async (event) => {
-    event.preventDefault();
+/* ---------- Действия ---------- */
 
-    const file = photoInput.files[0];
+function removeItem(id, card) {
+    const index = clothes.findIndex(c => c.id === id);
+    if (index === -1) return;
+    const removed = clothes[index];
 
-    if (!file) return;
+    card.classList.add("removing");
 
-    if (!file.type.startsWith("image/")) {
-        alert("Выбери изображение.");
+    setTimeout(() => {
+        clothes = clothes.filter(c => c.id !== id);
+        save();
+        render();
+        toast(`«${removed.name}» удалено`, "Вернуть", () => {
+            clothes.splice(Math.min(index, clothes.length), 0, removed);
+            enterIds.add(removed.id);
+            save();
+            render();
+        });
+    }, 280);
+}
+
+/* Модальное окно */
+function openEdit(id) {
+    const item = clothes.find(c => c.id === id);
+    if (!item) return;
+    editingId = id;
+    $("editName").value = item.name;
+    $("editDate").value = item.date;
+    $("editDate").max = today();
+    $("editInterval").value = item.interval;
+    $("overlay").classList.add("open");
+    setTimeout(() => $("editName").focus(), 100);
+}
+
+function closeEdit() {
+    $("overlay").classList.remove("open");
+    editingId = null;
+}
+
+$("editCancel").onclick = closeEdit;
+
+$("overlay").addEventListener("click", (e) => {
+    if (e.target === $("overlay")) closeEdit();
+});
+
+document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") closeEdit();
+    if (e.key === "Enter" && editingId && e.target.closest(".modal")) $("editSave").click();
+});
+
+$("editSave").onclick = () => {
+    const item = clothes.find(c => c.id === editingId);
+    if (!item) return closeEdit();
+
+    const name = $("editName").value.trim();
+    const date = $("editDate").value;
+    const interval = parseInt($("editInterval").value, 10);
+
+    if (!name || !date || !(interval > 0)) {
+        toast("Проверь, что все поля заполнены.");
         return;
     }
 
-    const photo = await resizeImage(file);
+    item.name = name;
+    item.date = date;
+    item.interval = interval;
+    save();
+    closeEdit();
+    render();
+    toast("Изменения сохранены");
+};
 
-    clothes.push({
+/* Форма добавления */
+$("addToggle").onclick = () => {
+    const section = $("addSection");
+    const open = section.classList.toggle("open");
+    $("addToggle").setAttribute("aria-expanded", open);
+    if (open) setTimeout(() => nameInput.focus(), 350);
+};
+
+dateInput.value = today();
+dateInput.max = today();
+
+photoInput.addEventListener("change", async () => {
+    const file = photoInput.files[0];
+    photoData = "";
+    preview.classList.remove("show");
+
+    if (!file) return;
+    if (!file.type.startsWith("image/")) {
+        toast("Выбери изображение.");
+        photoInput.value = "";
+        return;
+    }
+
+    try {
+        photoData = await resizeImage(file);
+        preview.src = photoData;
+        preview.classList.add("show");
+    } catch (e) {
+        toast("Не удалось прочитать изображение.");
+    }
+});
+
+form.addEventListener("submit", (event) => {
+    event.preventDefault();
+
+    const item = {
+        id: uid(),
         name: nameInput.value.trim(),
         date: dateInput.value,
-        photo: photo
-    });
+        photo: photoData,
+        interval: parseInt(intervalInput.value, 10) || 7,
+        added: Date.now()
+    };
 
-    save();
+    clothes.push(item);
+
+    if (!save()) {
+        clothes.pop();
+        return;
+    }
+
+    enterIds.add(item.id);
 
     form.reset();
-
+    photoData = "";
+    preview.classList.remove("show");
     dateInput.value = today();
+    intervalInput.value = 7;
 
     render();
+    toast(`«${item.name}» добавлено`);
 });
 
 function resizeImage(file) {
     return new Promise((resolve, reject) => {
-
         const reader = new FileReader();
 
         reader.onload = () => {
-
             const image = new Image();
 
             image.onload = () => {
+                const maxSize = 800;
+                let w = image.width, h = image.height;
+
+                if (w > h && w > maxSize) { h *= maxSize / w; w = maxSize; }
+                else if (h >= w && h > maxSize) { w *= maxSize / h; h = maxSize; }
 
                 const canvas = document.createElement("canvas");
-                const maxSize = 1000;
-
-                let width = image.width;
-                let height = image.height;
-
-                if (width > height && width > maxSize) {
-                    height *= maxSize / width;
-                    width = maxSize;
-                } else if (height > maxSize) {
-                    width *= maxSize / height;
-                    height = maxSize;
-                }
-
-                canvas.width = width;
-                canvas.height = height;
-
-                const ctx = canvas.getContext("2d");
-
-                ctx.drawImage(image, 0, 0, width, height);
-
-                resolve(
-                    canvas.toDataURL("image/jpeg", 0.8)
-                );
+                canvas.width = w;
+                canvas.height = h;
+                canvas.getContext("2d").drawImage(image, 0, 0, w, h);
+                resolve(canvas.toDataURL("image/jpeg", 0.75));
             };
 
             image.onerror = reject;
@@ -584,13 +1174,124 @@ function resizeImage(file) {
         };
 
         reader.onerror = reject;
-
         reader.readAsDataURL(file);
     });
 }
 
-render();
+/* Поиск, фильтры, сортировка */
+$("search").addEventListener("input", (e) => {
+    query = e.target.value.trim().toLowerCase();
+    render();
+});
 
+$("sort").addEventListener("change", (e) => {
+    sortMode = e.target.value;
+    render();
+});
+
+$("chips").addEventListener("click", (e) => {
+    const chip = e.target.closest(".chip");
+    if (!chip) return;
+    filter = chip.dataset.filter;
+    document.querySelectorAll(".chip").forEach(c => c.classList.toggle("active", c === chip));
+    render();
+});
+
+/* Резервная копия */
+$("exportBtn").onclick = () => {
+    if (clothes.length === 0) return toast("Нечего сохранять — гардероб пуст.");
+    const blob = new Blob([JSON.stringify(clothes)], { type: "application/json" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "postirochnaya-" + today() + ".json";
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+    toast("Копия сохранена");
+};
+
+$("importBtn").onclick = () => $("importFile").click();
+
+$("importFile").addEventListener("change", async (e) => {
+    const file = e.target.files[0];
+    e.target.value = "";
+    if (!file) return;
+
+    try {
+        const data = JSON.parse(await file.text());
+        if (!Array.isArray(data)) throw new Error();
+
+        const known = new Set(clothes.map(c => c.id));
+        let added = 0;
+
+        data.forEach((c, i) => {
+            if (!c || typeof c.name !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(c.date || "")) return;
+            const id = c.id && !known.has(c.id) ? c.id : uid() + i;
+            known.add(id);
+            clothes.push({
+                id,
+                name: c.name.slice(0, 60),
+                date: c.date,
+                photo: typeof c.photo === "string" ? c.photo : "",
+                interval: Number(c.interval) > 0 ? Number(c.interval) : 7,
+                added: c.added || Date.now() + i
+            });
+            enterIds.add(id);
+            added++;
+        });
+
+        if (added && save()) {
+            render();
+            toast(`Загружено вещей: ${added}`);
+        } else if (!added) {
+            toast("В файле не нашлось подходящих вещей.");
+        }
+    } catch (err) {
+        toast("Не удалось прочитать файл.");
+    }
+});
+
+/* ---------- Тема ---------- */
+
+function applyTheme(theme) {
+    document.documentElement.setAttribute("data-theme", theme);
+}
+
+applyTheme(document.documentElement.getAttribute("data-theme") || "light");
+
+$("themeToggle").addEventListener("click", () => {
+    const btn = $("themeToggle");
+    const next = document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark";
+
+    document.documentElement.classList.add("theme-anim");
+    btn.classList.add("spin");
+
+    setTimeout(() => {
+        applyTheme(next);
+        btn.classList.remove("spin");
+    }, 200);
+
+    try { localStorage.setItem(THEME_KEY, next); } catch (e) {}
+
+    setTimeout(() => document.documentElement.classList.remove("theme-anim"), 700);
+});
+
+// Следуем за системной темой, пока пользователь не выбрал свою
+window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", (e) => {
+    try { if (localStorage.getItem(THEME_KEY)) return; } catch (err) {}
+    applyTheme(e.matches ? "dark" : "light");
+});
+
+/* Обновляем статусы, если страница открыта через полночь */
+let lastDay = today();
+setInterval(() => {
+    if (today() !== lastDay) {
+        lastDay = today();
+        dateInput.max = today();
+        render();
+    }
+}, 60000);
+
+render();
 </script>
 
 </body>
