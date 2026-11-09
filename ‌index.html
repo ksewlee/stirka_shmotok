@@ -1,0 +1,597 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Постирочная</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    background: #f5f3ee;
+    color: #202c40;
+    font-family: Arial, sans-serif;
+}
+
+header {
+    padding: 35px 8%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #deddd7;
+}
+
+.logo {
+    font-family: Georgia, serif;
+    font-size: 27px;
+    letter-spacing: 1px;
+}
+
+.subtitle {
+    color: #898a8c;
+    font-size: 12px;
+    letter-spacing: 2px;
+    margin-top: 5px;
+}
+
+main {
+    max-width: 1100px;
+    margin: 55px auto;
+    padding: 0 20px;
+}
+
+.intro {
+    margin-bottom: 35px;
+}
+
+h1 {
+    font-family: Georgia, serif;
+    font-size: 38px;
+    font-weight: normal;
+    margin-bottom: 10px;
+}
+
+.intro p {
+    color: #858585;
+}
+
+.stats {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 35px;
+}
+
+.stat {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    flex: 1;
+}
+
+.stat strong {
+    display: block;
+    font-family: Georgia, serif;
+    font-size: 30px;
+    margin-bottom: 5px;
+}
+
+.stat span {
+    color: #888;
+    font-size: 13px;
+}
+
+.add-section {
+    background: white;
+    padding: 25px;
+    border-radius: 15px;
+    margin-bottom: 45px;
+}
+
+h2 {
+    font-family: Georgia, serif;
+    font-weight: normal;
+    font-size: 23px;
+}
+
+.form {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.field label {
+    font-size: 13px;
+    color: #777;
+}
+
+input {
+    padding: 12px;
+    border: 1px solid #deddd7;
+    border-radius: 7px;
+    background: #faf9f6;
+    font-size: 14px;
+    width: 100%;
+}
+
+.file-field {
+    grid-column: 1 / -1;
+}
+
+button {
+    border: none;
+    cursor: pointer;
+    border-radius: 7px;
+    padding: 13px 20px;
+    background: #202c40;
+    color: white;
+    font-size: 14px;
+    transition: 0.2s;
+}
+
+button:hover {
+    background: #394d69;
+}
+
+.add-button {
+    margin-top: 20px;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 22px;
+}
+
+.item {
+    background: white;
+    border-radius: 13px;
+    overflow: hidden;
+}
+
+.item img {
+    width: 100%;
+    height: 240px;
+    object-fit: cover;
+    background: #e8e6df;
+}
+
+.item-info {
+    padding: 18px;
+}
+
+.item-info h3 {
+    font-family: Georgia, serif;
+    font-size: 21px;
+    font-weight: normal;
+    margin: 0 0 13px;
+}
+
+.date {
+    font-size: 13px;
+    color: #888;
+    margin-bottom: 8px;
+}
+
+.elapsed {
+    font-size: 13px;
+    color: #394d69;
+    margin-bottom: 18px;
+}
+
+.card-buttons {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.card-buttons button {
+    flex: 1;
+    padding: 10px 5px;
+    font-size: 12px;
+    min-width: 75px;
+}
+
+.delete {
+    background: #eeeae5;
+    color: #555;
+}
+
+.delete:hover {
+    background: #ded8d0;
+}
+
+.empty {
+    color: #999;
+    text-align: center;
+    padding: 50px;
+    grid-column: 1 / -1;
+}
+
+footer {
+    text-align: center;
+    padding: 40px;
+    color: #aaa;
+    font-size: 12px;
+}
+
+@media(max-width: 750px) {
+    .grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media(max-width: 500px) {
+    .grid {
+        grid-template-columns: 1fr;
+    }
+
+    .form {
+        grid-template-columns: 1fr;
+    }
+
+    .file-field {
+        grid-column: auto;
+    }
+
+    .stats {
+        flex-direction: column;
+    }
+
+    h1 {
+        font-size: 30px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <div>
+        <div class="logo">ПОСТИРОЧНАЯ.</div>
+        <div class="subtitle">УХОД ЗА ВЕЩАМИ</div>
+    </div>
+    <div>✦</div>
+</header>
+
+<main>
+
+    <section class="intro">
+        <h1>Мой гардероб</h1>
+        <p>Все твои вещи в одном месте. Следи за чистотой и уходом.</p>
+    </section>
+
+    <section class="stats">
+        <div class="stat">
+            <strong id="total">0</strong>
+            <span>Всего вещей</span>
+        </div>
+
+        <div class="stat">
+            <strong id="washed">0</strong>
+            <span>Постирано сегодня</span>
+        </div>
+    </section>
+
+    <section class="add-section">
+        <h2>Добавить вещь</h2>
+
+        <form id="form">
+            <div class="form">
+
+                <div class="field">
+                    <label>Название вещи</label>
+                    <input id="name" type="text"
+                        placeholder="Например, белая рубашка" required>
+                </div>
+
+                <div class="field">
+                    <label>Дата последней стирки</label>
+                    <input id="date" type="date" required>
+                </div>
+
+                <div class="field file-field">
+                    <label>Фотография вещи</label>
+                    <input id="photo" type="file"
+                        accept="image/*" required>
+                </div>
+
+            </div>
+
+            <button class="add-button" type="submit">
+                + Добавить в гардероб
+            </button>
+        </form>
+    </section>
+
+    <section>
+        <h2>Мои вещи</h2>
+        <div class="grid" id="grid"></div>
+    </section>
+
+</main>
+
+<footer>
+    ПОСТИРОЧНАЯ · УХОД ЗА ВЕЩАМИ
+</footer>
+
+<script>
+
+const form = document.getElementById("form");
+const grid = document.getElementById("grid");
+const nameInput = document.getElementById("name");
+const dateInput = document.getElementById("date");
+const photoInput = document.getElementById("photo");
+
+let clothes = JSON.parse(
+    localStorage.getItem("wardrobeItems") || "[]"
+);
+
+function today() {
+    const d = new Date();
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+
+    return `${y}-${m}-${day}`;
+}
+
+dateInput.value = today();
+
+function save() {
+    try {
+        localStorage.setItem(
+            "wardrobeItems",
+            JSON.stringify(clothes)
+        );
+    } catch (error) {
+        alert("Не удалось сохранить данные. Возможно, память браузера заполнена.");
+    }
+}
+
+function formatDate(value) {
+    const [y, m, d] = value.split("-");
+    return `${d}.${m}.${y}`;
+}
+
+function daysPassed(value) {
+    const [y, m, d] = value.split("-").map(Number);
+
+    const date = new Date(y, m - 1, d);
+    const now = new Date();
+
+    const todayDate = new Date(
+        now.getFullYear(),
+        now.getMonth(),
+        now.getDate()
+    );
+
+    return Math.round(
+        (todayDate - date) / 86400000
+    );
+}
+
+function createElement(tag, className, text) {
+    const element = document.createElement(tag);
+
+    if (className) element.className = className;
+    if (text !== undefined) element.textContent = text;
+
+    return element;
+}
+
+function render() {
+    grid.innerHTML = "";
+
+    document.getElementById("total").textContent =
+        clothes.length;
+
+    document.getElementById("washed").textContent =
+        clothes.filter(item => item.date === today()).length;
+
+    if (clothes.length === 0) {
+        grid.appendChild(
+            createElement(
+                "div",
+                "empty",
+                "Твой гардероб пока пуст. Добавь первую вещь ✦"
+            )
+        );
+
+        return;
+    }
+
+    clothes.forEach((item, index) => {
+
+        const card = createElement("article", "item");
+
+        const img = document.createElement("img");
+        img.src = item.photo;
+        img.alt = item.name;
+
+        const info = createElement("div", "item-info");
+
+        const title = createElement("h3", "", item.name);
+
+        const date = createElement(
+            "div",
+            "date",
+            "Последняя стирка: " + formatDate(item.date)
+        );
+
+        const days = daysPassed(item.date);
+
+        let elapsedText;
+
+        if (days < 0) {
+            elapsedText = "Дата стирки ещё не наступила";
+        } else if (days === 0) {
+            elapsedText = "Постирано сегодня ✦";
+        } else if (days === 1) {
+            elapsedText = "Прошёл 1 день после стирки";
+        } else {
+            elapsedText = `Прошло ${days} дней после стирки`;
+        }
+
+        const elapsed = createElement(
+            "div",
+            "elapsed",
+            elapsedText
+        );
+
+        const buttons = createElement("div", "card-buttons");
+
+        const wash = createElement(
+            "button",
+            "",
+            "✓ Постирано сегодня"
+        );
+
+        wash.onclick = () => {
+            clothes[index].date = today();
+            save();
+            render();
+        };
+
+        const edit = createElement(
+            "button",
+            "delete",
+            "Изменить дату"
+        );
+
+        edit.onclick = () => {
+            const newDate = prompt(
+                "Введите новую дату стирки (ГГГГ-ММ-ДД):",
+                item.date
+            );
+
+            if (
+                newDate &&
+                /^\d{4}-\d{2}-\d{2}$/.test(newDate) &&
+                !isNaN(Date.parse(newDate))
+            ) {
+                clothes[index].date = newDate;
+                save();
+                render();
+            } else if (newDate) {
+                alert("Проверь формат даты.");
+            }
+        };
+
+        const remove = createElement(
+            "button",
+            "delete",
+            "Удалить"
+        );
+
+        remove.onclick = () => {
+            if (confirm("Удалить эту вещь из гардероба?")) {
+                clothes.splice(index, 1);
+                save();
+                render();
+            }
+        };
+
+        buttons.append(wash, edit, remove);
+
+        info.append(title, date, elapsed, buttons);
+
+        card.append(img, info);
+
+        grid.appendChild(card);
+    });
+}
+
+form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    const file = photoInput.files[0];
+
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+        alert("Выбери изображение.");
+        return;
+    }
+
+    const photo = await resizeImage(file);
+
+    clothes.push({
+        name: nameInput.value.trim(),
+        date: dateInput.value,
+        photo: photo
+    });
+
+    save();
+
+    form.reset();
+
+    dateInput.value = today();
+
+    render();
+});
+
+function resizeImage(file) {
+    return new Promise((resolve, reject) => {
+
+        const reader = new FileReader();
+
+        reader.onload = () => {
+
+            const image = new Image();
+
+            image.onload = () => {
+
+                const canvas = document.createElement("canvas");
+                const maxSize = 1000;
+
+                let width = image.width;
+                let height = image.height;
+
+                if (width > height && width > maxSize) {
+                    height *= maxSize / width;
+                    width = maxSize;
+                } else if (height > maxSize) {
+                    width *= maxSize / height;
+                    height = maxSize;
+                }
+
+                canvas.width = width;
+                canvas.height = height;
+
+                const ctx = canvas.getContext("2d");
+
+                ctx.drawImage(image, 0, 0, width, height);
+
+                resolve(
+                    canvas.toDataURL("image/jpeg", 0.8)
+                );
+            };
+
+            image.onerror = reject;
+            image.src = reader.result;
+        };
+
+        reader.onerror = reject;
+
+        reader.readAsDataURL(file);
+    });
+}
+
+render();
+
+</script>
+
+</body>
+</html>
